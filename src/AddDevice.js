@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Input, Select, Form, Button, Upload } from 'antd'
+import { Card, Input, Select, Form, Button, Upload, message } from 'antd'
 import { UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -54,18 +54,33 @@ export default function AddDevice() {
     };
 
     const onFinish = (values) => {
-        axios.post('https://ucltest.acorns.life/device/add', JSON.stringify(values))
+        console.log('Success:', values)
+        let formdata = new FormData()
+        let data = values
+        data.device_image = data.device_image[0]
+
+        formdata.append('serial_number', data.device_name)
+        formdata.append('device_name', data.device_name)
+        formdata.append('brand_id', data.brand_id)
+        formdata.append('location_id', data.location_id)
+        formdata.append('device_image', data.device_image)
+
+        console.log(data)
+        axios.post('https://ucltest.acorns.life/device/add', formdata)
         .then(res => {
+            console.log("loading.....")
+            console.log(res)
             if (res.status === 200){
                 if (res.data.status === 'success'){
+                    message.success('device added successfully')
                     navigate('/')
                 }
             }
         })
         .catch(e => {
             console.log('error')
+            message.error(e.message)
         })
-        console.log('Success:', values);
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -144,7 +159,7 @@ export default function AddDevice() {
                     </Form.Item>
 
                     <Form.Item
-                        name="devive_image"
+                        name="device_image"
                         label="Device Image"
                         valuePropName="fileList"
                         getValueFromEvent={normFile}

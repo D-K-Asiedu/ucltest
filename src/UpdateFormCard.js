@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Input, Select, Form, Button, Upload } from 'antd'
+import { Card, Input, Select, Form, Button, Upload, message } from 'antd'
 import { UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -55,9 +55,23 @@ export default function UpdateFormCard({device}) {
     };
 
     const onFinish = (values) => {
-        axios.post('https://ucltest.acorns.life/device/update', JSON.stringify(values))
+        console.log(values)
+        let formdata = new FormData()
+        let data = values
+        data.device_image = data.device_image[0]
+
+        formdata.append('serial_number', data.device_name)
+        formdata.append('device_name', data.device_name)
+        formdata.append('brand_id', data.brand_id)
+        formdata.append('location_id', data.location_id)
+        formdata.append('device_image', data.device_image)
+
+        console.log(data)
+        axios.post(`https://ucltest.acorns.life/device/update/${id}`, formdata)
         .then(res => {
+            console.log(res)
             if (res.status === 200){
+                message.success('device updated successfully')
                 navigate('/')
             }
         })
@@ -74,7 +88,7 @@ export default function UpdateFormCard({device}) {
     return (
         <>
 
-            <Card boardered={true} title="Update Device" style={{ maxWidth: 350, }}>
+            <Card boardered={true} title="Update Device">
                 <Form
                     name="basic"
                     onFinish={onFinish}
@@ -146,8 +160,8 @@ export default function UpdateFormCard({device}) {
                         </Select>
                     </Form.Item>
 
-                    {/* <Form.Item
-                        name="devive_image"
+                    <Form.Item
+                        name="device_image"
                         label="Device Image"
                         valuePropName="fileList"
                         getValueFromEvent={normFile}
@@ -155,7 +169,7 @@ export default function UpdateFormCard({device}) {
                         <Upload name="device_image"  listType="picture" action="/upload.do">
                             <Button icon={<UploadOutlined />}>Click to upload</Button>
                         </Upload>
-                    </Form.Item> */}
+                    </Form.Item>
 
                     <Form.Item>
                         <Button type="primary" htmlType="submit">

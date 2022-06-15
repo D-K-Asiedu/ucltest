@@ -24,10 +24,10 @@ export default function Home() {
         axios.get('https://ucltest.acorns.life/devices')
         .then((res)=>{
             if (res.status === 200){
-                if (res.data.status !== 'success'){
-                    message.error('error fetching devices')
-                }
                 setDevices(res.data['data'])
+                if (!devices){
+                    message.error('failed to fetch data')
+                }
             }
             // setDevices(data)
         })
